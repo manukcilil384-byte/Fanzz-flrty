@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>𝘍𝘈𝘕𝘡𝘡</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: #050509; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+            touch-action: manipulation;
+        }
+        .glass { 
+            background: rgba(255, 255, 255, 0.04); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+        
+        /* Container scroll untuk daftar tombol */
+        .scroll-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-bottom: 40px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .btn-premium {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .btn-premium:active { transform: scale(0.96); background: rgba(255, 255, 255, 0.1); }
+
+        /* Animasi muncul */
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Tampilan Layar Kunci */
+        #lock-screen {
+            display: none; /* Default sembunyi */
+            position: fixed;
+            inset: 0;
+            background: #050509;
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Custom Scrollbar */
+        .scroll-container::-webkit-scrollbar { width: 0px; }
+    </style>
+</head>
+<body class="text-white p-6">
+
+    <div id="lock-screen">
+        <div class="text-[110px] mb-8 drop-shadow-[0_0_40px_rgba(239,68,68,0.4)]">🔒</div>
+        <h1 class="text-3xl font-black tracking-tighter uppercase italic">Server Closed</h1>
+        <p class="text-slate-500 text-xs font-bold mt-4 tracking-[0.4em] uppercase">Maintenance Mode</p>
+        <div class="mt-12 w-16 h-1 bg-red-600 rounded-full animate-pulse"></div>
+    </div>
+
+    <div class="flex justify-between items-center mb-10 shrink-0">
+        <div class="flex items-center gap-4">
+            <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center font-black text-2xl shadow-2xl shadow-blue-900/40">M</div>
+            <div>
+                <h1 class="text-xl font-extrabold tracking-tighter uppercase italic leading-none">Mediafire</h1>
+                <span class="text-[9px] text-blue-400 font-bold tracking-[0.3em]">PREMIUM CLOUD</span>
+            </div>
+        </div>
+        <div class="glass px-4 py-2 rounded-2xl border-white/10">
+            <span class="text-[10px] font-black uppercase tracking-widest text-emerald-400 animate-pulse">● Online</span>
+        </div>
+    </div>
+
+    <div class="scroll-container">
+        <p class="text-[10px] font-black text-sky-500 tracking-[0.4em] uppercase mb-6 ml-1">My Premium Dashboard</p>
+        
+        <div id="buttonList" class="space-y-4">
+            <div class="text-center py-20 opacity-20 text-[10px] font-bold tracking-widest uppercase animate-pulse">Menghubungkan ke Server...</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // Konfigurasi Database Anda
+        const firebaseConfig = {
+            apiKey: "AIzaSyC_CzpM8loteQzOzfEWCz5cyhRhM1X8RTY",
+            authDomain: "control-admin-b96e2.firebaseapp.com",
+            databaseURL: "https://control-admin-b96e2-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "control-admin-b96e2",
+            storageBucket: "control-admin-b96e2.firebasestorage.app",
+            messagingSenderId: "17029274720",
+            appId: "1:17029274720:web:b3f3ca1a74f3063d4af705"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const controlRef = ref(db, 'remote_control');
+
+        // Mendengarkan Perubahan di Admin secara Real-time
+        onValue(controlRef, (snapshot) => {
+            const data = snapshot.val();
+            if (!data) return;
+
+            // 1. Cek Status Server (Lock Screen)
+            const lockScreen = document.getElementById('lock-screen');
+            if (data.serverStatus === false) {
+                lockScreen.style.display = 'flex';
+                return; // Stop eksekusi jika server terkunci
+            } else {
+                lockScreen.style.display = 'none';
+            }
+
+            // 2. Render Daftar Tombol (1-10)
+            const listContainer = document.getElementById('buttonList');
+            listContainer.innerHTML = ""; // Bersihkan list sebelumnya
+            let countVisible = 0;
+
+            for (let i = 1; i <= 10; i++) {
+                const btnData = data[`btn_${i}`];
+                
+                // Aturan: Harus Ada URL dan Tidak di-Hide
+                if (btnData && !btnData.hidden && btnData.url && btnData.url.trim() !== "") {
+                    countVisible++;
+                    const displayName = btnData.name || `Folder Cloud ${i}`;
+                    
+                    listContainer.innerHTML += `
+                        <button onclick="window.location.href='${btnData.url}'" 
+                                class="glass btn-premium p-7 rounded-[2.8rem] flex items-center gap-6 w-full fade-in" 
+                                style="animation-delay: ${countVisible * 0.05}s">
+                            <div class="text-5xl drop-shadow-md">📂</div>
+                            <div class="text-left">
+                                <h2 class="text-xl font-black mb-0.5 tracking-tight">${displayName}</h2>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Akses Download Cepat</p>
+                            </div>
+                        </button>
+                    `;
+                }
+            }
+
+            // Jika semua tombol di-hide atau tidak ada link
+            if (countVisible === 0) {
+                listContainer.innerHTML = `
+                    <div class="text-center py-24 opacity-30">
+                        <p class="text-[10px] font-black uppercase tracking-[0.5em]">Tidak ada data</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
