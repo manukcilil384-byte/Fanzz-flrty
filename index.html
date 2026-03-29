@@ -3,229 +3,256 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>𝘍𝘈𝘕𝘡𝘡 - SECURE v5.6</title>
+    <title>𝘍𝘈𝘕𝘡𝘡 v6.3</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #050509; height: 100vh; display: flex; flex-direction: column; overflow: hidden; touch-action: none; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #050509; height: 100vh; overflow: hidden; color: white; touch-action: none; }
         .glass { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .scroll-container { flex-grow: 1; overflow-y: auto; padding-bottom: 100px; -webkit-overflow-scrolling: touch; }
+        .scroll-container { flex-grow: 1; overflow-y: auto; padding: 0 24px 120px 24px; -webkit-overflow-scrolling: touch; }
         .scroll-container::-webkit-scrollbar { width: 0px; }
 
-        /* --- VERIFIKASI GESER UI --- */
-        #verify-overlay {
-            position: fixed; inset: 0; background: #050509; z-index: 10000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px;
-        }
-        .slider-container {
-            width: 100%; max-width: 320px; height: 70px; background: rgba(255,255,255,0.03);
-            border-radius: 50px; position: relative; border: 1px solid rgba(255,255,255,0.08); overflow: hidden;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
-        }
-        .slider-text {
-            position: absolute; width: 100%; text-align: center; line-height: 70px;
-            font-size: 13px; font-weight: 800; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 2px;
-            user-select: none;
-        }
-        #slider-handle {
-            width: 60px; height: 60px; background: #2563eb; border-radius: 50%;
-            position: absolute; top: 5px; left: 5px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; 
-            box-shadow: 0 0 25px rgba(37,99,235,0.6);
-            z-index: 2;
-            /* Z.AI Animasi Mental Balik */
-            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55), background 0.2s;
-        }
-        #slider-handle i { font-size: 24px; transition: 0.2s; }
-        
-        /* --- LOADING 20s UI --- */
-        #loading-screen {
-            display: none; position: fixed; inset: 0; background: #050509; z-index: 10001;
-            flex-direction: column; align-items: center; justify-content: center;
-        }
-        .progress-bar { width: 260px; height: 5px; background: rgba(255,255,255,0.08); border-radius: 10px; margin-top: 25px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+        /* --- VERIFIKASI GESER (20S) --- */
+        #verify-overlay { position: fixed; inset: 0; background: #050509; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; }
+        .slider-container { width: 100%; max-width: 320px; height: 70px; background: rgba(255,255,255,0.03); border-radius: 50px; position: relative; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; }
+        .slider-text { position: absolute; width: 100%; text-align: center; line-height: 70px; font-size: 13px; font-weight: 800; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 2px; }
+        #slider-handle { width: 60px; height: 60px; background: #2563eb; border-radius: 50%; position: absolute; top: 5px; left: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 25px rgba(37,99,235,0.6); z-index: 2; transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+
+        #loading-screen { display: none; position: fixed; inset: 0; background: #050509; z-index: 10001; flex-direction: column; align-items: center; justify-content: center; }
+        .progress-bar { width: 260px; height: 5px; background: rgba(255,255,255,0.08); border-radius: 10px; margin-top: 25px; overflow: hidden; }
         .progress-fill { width: 0%; height: 100%; background: #00ff00; box-shadow: 0 0 20px #00ff00; transition: width 20s linear; }
 
-        /* --- FLOATING BUTTONS (BIGGER) --- */
-        .z-floating-contact { position: fixed; bottom: 30px; right: 25px; display: flex; flex-direction: column; gap: 18px; z-index: 999; }
-        .z-btn-contact { 
-            width: 65px; height: 65px; /* SCALED UP FROM 55px */
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-            font-size: 30px; /* SCALED UP FROM 26px */
-            color: white; transition: 0.3s; 
-            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-        }
-        .z-btn-contact:active { transform: scale(0.9) translateY(2px); }
-        .z-wa { background: #25D366; box-shadow: 0 0 25px rgba(37,211,102,0.5); }
-        .z-tg { background: #0088cc; box-shadow: 0 0 25px rgba(0, 136, 204, 0.5); }
+        /* --- MENU DROPDOWN --- */
+        #menu-dropdown { position: absolute; top: 70px; right: 0; width: 240px; background: rgba(10, 10, 20, 0.98); backdrop-filter: blur(25px); border: 1px solid rgba(0, 255, 0, 0.3); border-radius: 25px; padding: 15px; display: none; flex-direction: column; gap: 8px; z-index: 10002; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .menu-item { padding: 14px; font-size: 11px; font-weight: 800; text-transform: uppercase; display: flex; align-items: center; gap: 12px; cursor: pointer; border-radius: 12px; color: #aaa; transition: 0.2s; }
+        .menu-item:hover { background: rgba(0,255,0,0.1); color: #00ff00; }
 
-        /* folder list animation */
-        .fade-in-up { animation: fadeInUp 0.4s ease-out forwards; opacity: 0; }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        /* --- PREMIUM CHAT SYSTEM --- */
+        #chat-loading { display: none; position: fixed; inset: 0; background: #050509; z-index: 10010; flex-direction: column; align-items: center; justify-content: center; }
+        .loader-ring { width: 60px; height: 60px; border: 3px solid rgba(0,255,0,0.1); border-top: 3px solid #00ff00; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        #chat-screen { display: none; position: fixed; inset: 0; background: radial-gradient(circle at top right, #0a1f16, #050509); z-index: 10005; flex-direction: column; }
+        .chat-header { background: rgba(255,255,255,0.03); backdrop-filter: blur(15px); padding: 25px; display: flex; align-items: center; gap: 20px; border-bottom: 1px solid rgba(0,255,0,0.1); }
+        .admin-avatar { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(45deg, #00ff00, #0088ff); display: flex; align-items: center; justify-content: center; font-weight: 900; color: white; box-shadow: 0 0 15px rgba(0,255,0,0.3); position: relative; }
+        .admin-avatar::after { content: ''; position: absolute; inset: -3px; border: 2px solid #00ff00; border-radius: 50%; animation: pulse-ring 2s infinite; }
+        @keyframes pulse-ring { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.3); opacity: 0; } }
+
+        .chat-body { flex-grow: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'); }
+        .msg { padding: 15px 20px; font-size: 15px; line-height: 1.5; max-width: 85%; animation: slideIn 0.3s ease-out forwards; }
+        @keyframes slideIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        .msg-in { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); align-self: flex-start; border-radius: 20px 20px 20px 5px; color: #ddd; }
+        .msg-out { background: linear-gradient(135deg, #005c4b, #00b069); align-self: flex-end; border-radius: 20px 20px 5px 20px; color: white; box-shadow: 0 5px 15px rgba(0,255,0,0.1); }
+
+        /* --- LOCK SCREEN --- */
+        #lock-screen { display: none; position: fixed; inset: 0; background: #050509; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+
+        /* --- FLOATING --- */
+        .z-floating { position: fixed; bottom: 30px; right: 25px; display: flex; flex-direction: column; gap: 18px; z-index: 998; }
+        .z-btn { width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; box-shadow: 0 8px 25px rgba(0,0,0,0.6); }
     </style>
 </head>
-<body class="text-white p-6">
+<body>
 
     <div id="verify-overlay">
         <div class="text-7xl mb-8 drop-shadow-[0_0_30px_rgba(37,99,235,0.3)]">🛡️</div>
-        <h2 class="text-2xl font-black italic uppercase tracking-tighter mb-12">Access Verification</h2>
+        <h2 class="text-2xl font-black italic uppercase tracking-tighter mb-12 text-center" id="l-verify">Access Verification</h2>
         <div class="slider-container">
-            <div class="slider-text">Geser Untuk Masuk</div>
-            <div id="slider-handle"><i class="fas fa-chevron-right text-white"></i></div>
+            <div class="slider-text" id="l-slider">Geser Untuk Masuk</div>
+            <div id="slider-handle"><i class="fas fa-chevron-right"></i></div>
         </div>
     </div>
 
     <div id="loading-screen">
-        <div class="text-emerald-500 font-black text-sm tracking-[0.5em] uppercase mb-2 animate-pulse">Decrypting Server...</div>
-        <div id="timer-text" class="text-[11px] text-slate-500 font-bold mb-5">Security check in progress. Please wait 20s</div>
+        <div class="text-emerald-500 font-black text-sm tracking-[0.5em] uppercase mb-2 animate-pulse">Decrypting...</div>
         <div class="progress-bar"><div id="p-fill" class="progress-fill"></div></div>
     </div>
 
-    <div class="flex justify-between items-center mb-10 shrink-0">
+    <div id="lock-screen">
+        <div class="text-[110px] mb-8">🔒</div>
+        <h1 class="text-3xl font-black uppercase italic">Server Locked</h1>
+    </div>
+
+    <div class="p-6 flex justify-between items-start relative">
         <div class="flex items-center gap-4">
             <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center font-black text-2xl shadow-xl shadow-blue-900/50">M</div>
             <div>
-                <h1 class="text-xl font-extrabold tracking-tighter uppercase italic leading-none">Mediafire</h1>
-                <span class="text-[9px] text-blue-400 font-bold tracking-[0.3em]">PREMIUM CLOUD Dvlo Fanzz</span>
+                <h1 class="text-xl font-extrabold tracking-tighter uppercase italic leading-none" id="l-brand">Mediafire</h1>
+                <span class="text-[9px] text-blue-400 font-bold tracking-[0.3em]" id="l-sub">PREMIUM CLOUD DVLO</span>
             </div>
         </div>
-        <div class="glass px-4 py-2 rounded-2xl border-white/10">
-            <span class="text-[10px] font-black uppercase tracking-widest text-emerald-400 animate-pulse">● Online</span>
+        <div class="flex items-center gap-3">
+            <div class="glass px-3 py-2 rounded-xl text-[9px] font-black text-emerald-400 animate-pulse">● ONLINE</div>
+            <div class="cursor-pointer p-2" onclick="toggleMenu()">
+                <div style="height:3px; background:#0f0; width:24px; margin-bottom:5px; transform:rotate(-15deg); box-shadow:0 0 8px #0f0;"></div>
+                <div style="height:3px; background:#0f0; width:18px; margin-bottom:5px; transform:rotate(-15deg); box-shadow:0 0 8px #0f0;"></div>
+            </div>
+            
+            <div id="menu-dropdown">
+                <div class="menu-item" onclick="clearCahcah()"><i class="fas fa-bolt text-yellow-400"></i> <span id="l-cache">Cahcah (Real-time)</span></div>
+                <div class="menu-item" onclick="triggerPremiumChat()"><i class="fab fa-whatsapp text-emerald-500"></i> <span id="l-admin">Admin (Chat)</span></div>
+                <div class="menu-item">
+                    <i class="fas fa-globe text-blue-400"></i>
+                    <select onchange="changeLang(this.value)" class="bg-transparent outline-none text-xs font-bold text-white">
+                        <option value="id" class="bg-black">Indo</option>
+                        <option value="en" class="bg-black">Eng</option>
+                        <option value="es" class="bg-black">Esp</option>
+                        <option value="jp" class="bg-black">Jpn</option>
+                    </select>
+                </div>
+                <hr class="border-white/5 my-1">
+                <div class="menu-item" onclick="location.reload()" style="color: #ff4444;"><i class="fas fa-power-off"></i> <span id="l-logout">Logout</span></div>
+            </div>
         </div>
     </div>
 
-    <div class="scroll-container">
-        <p class="text-[10px] font-black text-sky-500 tracking-[0.4em] uppercase mb-6 ml-1">My Premium Dashboard</p>
-        <div id="buttonList" class="space-y-4">
-            <div class="text-center py-20 opacity-20 text-[10px] font-bold tracking-widest uppercase animate-pulse">Memuat Data...</div>
+    <div class="scroll-container" id="buttonList">
+        <p class="text-[10px] font-black text-sky-500 tracking-[0.4em] uppercase mb-6 ml-1" id="l-dash">Dashboard Premium</p>
+    </div>
+
+    <div id="chat-loading">
+        <div class="loader-ring mb-6"></div>
+        <p class="text-[10px] font-black tracking-[0.5em] text-emerald-500 animate-pulse">ESTABLISHING ENCRYPTED LINK...</p>
+    </div>
+
+    <div id="chat-screen">
+        <div class="chat-header">
+            <i class="fas fa-chevron-left text-2xl cursor-pointer" onclick="closeChat()"></i>
+            <div class="admin-avatar">F</div>
+            <div>
+                <p class="font-extrabold text-lg tracking-tight">Fanzz Admin</p>
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
+                    <span class="text-[10px] font-bold text-emerald-500">Online</span>
+                </div>
+            </div>
+        </div>
+        <div class="chat-body" id="chat-box">
+            <div class="msg msg-in">Welcome Master Fanzz. <br>System ready for communication.</div>
+        </div>
+        <div class="p-5 flex gap-3 bg-black/50 backdrop-blur-xl">
+            <input type="text" id="chat-input" placeholder="Type message..." class="flex-grow bg-white/5 border border-white/10 rounded-2xl px-5 py-3 outline-none text-white">
+            <button onclick="sendToTele()" class="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center text-black shadow-lg shadow-emerald-500/20"><i class="fas fa-paper-plane text-xl"></i></button>
         </div>
     </div>
 
-    <div class="z-floating-contact">
-        <a href="https://t.me/GIGS_XYREN" target="_blank" class="z-btn-contact z-tg"><i class="fab fa-telegram-plane"></i></a>
-        <a href="https://wa.me/628xxxxxxxxxx" target="_blank" class="z-btn-contact z-wa"><i class="fab fa-whatsapp"></i></a>
+    <div class="z-floating">
+        <a href="https://t.me/fanzz_tz" target="_blank" class="z-btn" style="background:#0088cc"><i class="fab fa-telegram-plane"></i></a>
+        <a href="https://wa.me/6285808608116" target="_blank" class="z-btn" style="background:#25D366"><i class="fab fa-whatsapp"></i></a>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // CONFIG (Lu pake yang punya lu sendiri)
-        const firebaseConfig = {
-            apiKey: "AIzaSyC_CzpM8loteQzOzfEWCz5cyhRhM1X8RTY",
-            databaseURL: "https://control-admin-b96e2-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "control-admin-b96e2",
-        };
-
+        const firebaseConfig = { databaseURL: "https://control-admin-b96e2-default-rtdb.asia-southeast1.firebasedatabase.app" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        const controlRef = ref(db, 'remote_control');
 
-        // --- LOGIKA SLIDER & ANIMASI ---
-        const handle = document.getElementById('slider-handle');
-        const overlay = document.getElementById('verify-overlay');
-        const loading = document.getElementById('loading-screen');
-        const fill = document.getElementById('p-fill');
-        const icon = handle.querySelector('i');
-        
-        let isDragging = false;
-        let startX = 0;
-        // Hitung batas geser maks dinamisi (container width - handle width - padding)
-        const maxSlide = 320 - 60 - 10; 
-
-        handle.addEventListener('touchstart', (e) => {
-            isDragging = true;
-            startX = e.touches[0].clientX;
-            // Matikan transisi pas lagi ditarik jari biar responsif
-            handle.style.transition = 'none'; 
-            icon.style.transform = 'scale(1.2)';
-        });
-
-        document.addEventListener('touchmove', (e) => {
-            if(!isDragging) return;
-            let currentX = e.touches[0].clientX;
-            let moveX = currentX - startX;
-
-            // Batasi gerakan: nggak boleh minus, nggak boleh ngelebihi batas maks
-            if(moveX < 0) moveX = 0;
-            if(moveX > maxSlide) moveX = maxSlide;
-
-            handle.style.transform = `translateX(${moveX}px)`;
-
-            // Efek warna handle pas mendekati ujung
-            if(moveX > maxSlide * 0.8) {
-                handle.style.background = '#10b981'; // Ijo Emerald
-            } else {
-                handle.style.background = '#2563eb'; // Biru default
-            }
-
-            // Kalau sampe ujung, langsung eksekusi
-            if(moveX >= maxSlide) {
-                isDragging = false;
-                startLoading();
-            }
-        });
-
-        document.addEventListener('touchend', () => {
-            if(!isDragging) return;
-            isDragging = false;
-            
-            // AKTIFKAN ANIMASI MENTAL BALIK
-            handle.style.transition = 'transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55), background 0.2s';
-            handle.style.transform = 'translateX(0px)';
-            handle.style.background = '#2563eb';
-            icon.style.transform = 'scale(1)';
-        });
-
-        function startLoading() {
-            // Matikan scroll body pas loading
-            document.body.style.overflow = 'hidden'; 
-            overlay.style.display = 'none';
-            loading.style.display = 'flex';
-            
-            // Mulai animasi progress bar (linear 20s sesuai CSS)
-            setTimeout(() => { fill.style.width = '100%'; }, 100);
-            
-            // SELESAI LOADING SETELAH 20 DETIK
-            setTimeout(() => {
-                loading.style.display = 'none';
-                document.body.style.overflow = 'auto'; // Aktifkan scroll lagi
-            }, 20000); 
-        }
-
-        // --- FIREBASE SYNC (AUTO REFRESH REALTIME) ---
-        onValue(controlRef, (snapshot) => {
-            const data = snapshot.val();
-            if (!data) return;
-            const listContainer = document.getElementById('buttonList');
-            listContainer.innerHTML = "";
-            let visibleCount = 0;
-
+        onValue(ref(db, 'remote_control'), (snap) => {
+            const data = snap.val();
+            if(!data) return;
+            document.getElementById('lock-screen').style.display = (data.serverStatus === false) ? 'flex' : 'none';
+            const list = document.getElementById('buttonList');
+            const dashHeader = `<p class="text-[10px] font-black text-sky-500 tracking-[0.4em] uppercase mb-6 ml-1" id="l-dash">Dashboard Premium</p>`;
+            list.innerHTML = dashHeader;
             for (let i = 1; i <= 10; i++) {
-                const btn = data[`btn_${i}`];
-                if (btn && !btn.hidden && btn.url) {
-                    visibleCount++;
-                    listContainer.innerHTML += `
-                        <div onclick="window.location.href='${btn.url}'" 
-                             class="glass p-7 rounded-[2.8rem] flex items-center gap-6 w-full mb-4 fade-in-up active:scale-95 transition-transform"
-                             style="animation-delay: ${visibleCount * 0.05}s">
-                            <div class="text-5xl drop-shadow-md">📂</div>
-                            <div>
-                                <h2 class="text-xl font-black leading-tight">${btn.name || 'Folder '+i}</h2>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Akses Download Cepat</p>
-                            </div>
-                        </div>`;
+                const b = data[`btn_${i}`];
+                if (b && !b.hidden && b.url) {
+                    list.innerHTML += `<div onclick="window.location.href='${b.url}'" class="glass p-7 rounded-[2.8rem] flex items-center gap-6 mb-4 active:scale-95 transition-all"><div class="text-5xl drop-shadow-lg">📂</div><div><h2 class="text-xl font-black">${b.name || 'Cloud '+i}</h2><p class="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Direct Link Access</p></div></div>`;
                 }
             }
-            if(visibleCount === 0) {
-                listContainer.innerHTML = `<div class="text-center py-20 opacity-30 text-[10px] font-bold tracking-widest uppercase">Tidak ada data server</div>`;
+        });
+    </script>
+
+    <script>
+        const BOT_TOKEN = "8591728666:AAGULKVjJnm33W8VODEaKzh37wSVhYQ3brQ";
+        const ADMIN_ID = "7368525423";
+
+        // MULTI LANG SYSTEM
+        const langs = {
+            id: { brand: "Mediafire", sub: "PREMIUM CLOUD DVLO", dash: "Dashboard Premium", cache: "Cahcah (Real-time)", admin: "Admin (Chat)", logout: "Keluar", verify: "Verifikasi Akses", slider: "Geser Untuk Masuk" },
+            en: { brand: "Server", sub: "PREMIUM ACCESS", dash: "Premium Dashboard", cache: "Clear Cache", admin: "Admin Chat", logout: "Logout", verify: "Access Verify", slider: "Slide to Enter" },
+            es: { brand: "Servidor", sub: "ACCESO PREMIUM", dash: "Panel de Control", cache: "Limpiar", admin: "Chat Admin", logout: "Cerrar", verify: "Verificación", slider: "Desliza para entrar" },
+            jp: { brand: "クラウド", sub: "プレミアム", dash: "ダッシュボード", cache: "キャッシュクリア", admin: "管理チャット", logout: "ログアウト", verify: "認証", slider: "スライドして入る" }
+        };
+
+        function changeLang(l) {
+            const d = langs[l];
+            document.getElementById('l-brand').innerText = d.brand;
+            document.getElementById('l-sub').innerText = d.sub;
+            document.getElementById('l-dash').innerText = d.dash;
+            document.getElementById('l-cache').innerText = d.cache;
+            document.getElementById('l-admin').innerText = d.admin;
+            document.getElementById('l-logout').innerText = d.logout;
+            document.getElementById('l-verify').innerText = d.verify;
+            document.getElementById('l-slider').innerText = d.slider;
+        }
+
+        // CHAT LOGIC
+        function triggerPremiumChat() {
+            toggleMenu();
+            const loading = document.getElementById('chat-loading');
+            loading.style.display = 'flex';
+            setTimeout(() => {
+                loading.style.display = 'none';
+                document.getElementById('chat-screen').style.display = 'flex';
+            }, 10000);
+        }
+
+        function sendToTele() {
+            const input = document.getElementById('chat-input');
+            const box = document.getElementById('chat-box');
+            if(!input.value) return;
+            box.innerHTML += `<div class="msg msg-out">${input.value}</div>`;
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${ADMIN_ID}&text=User Message: ${input.value}`);
+            input.value = "";
+            box.scrollTop = box.scrollHeight;
+        }
+
+        let lastUpdate = 0;
+        setInterval(async () => {
+            try {
+                const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${lastUpdate + 1}`);
+                const d = await r.json();
+                if(d.result.length > 0) {
+                    d.result.forEach(i => {
+                        lastUpdate = i.update_id;
+                        if(i.message && i.message.from.id == ADMIN_ID) {
+                            const box = document.getElementById('chat-box');
+                            box.innerHTML += `<div class="msg msg-in">${i.message.text}</div>`;
+                            box.scrollTop = box.scrollHeight;
+                        }
+                    });
+                }
+            } catch (e) {}
+        }, 3000);
+
+        // UI CORE
+        function toggleMenu() { const m = document.getElementById('menu-dropdown'); m.style.display = (m.style.display==='flex')?'none':'flex'; }
+        function closeChat() { document.getElementById('chat-screen').style.display = 'none'; }
+        function clearCahcah() { location.reload(true); }
+
+        const h = document.getElementById('slider-handle');
+        let drag = false, sx = 0;
+        h.addEventListener('touchstart', e => { drag = true; sx = e.touches[0].clientX; h.style.transition = 'none'; });
+        document.addEventListener('touchmove', e => {
+            if(!drag) return;
+            let x = e.touches[0].clientX - sx;
+            if(x < 0) x = 0; if(x > 245) x = 245;
+            h.style.transform = `translateX(${x}px)`;
+            if(x >= 245) {
+                drag = false;
+                document.getElementById('verify-overlay').style.display = 'none';
+                document.getElementById('loading-screen').style.display = 'flex';
+                setTimeout(() => { document.getElementById('p-fill').style.width = '100%'; }, 100);
+                setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; document.body.style.touchAction = 'auto'; }, 20000);
             }
         });
+        document.addEventListener('touchend', () => { if(drag) { drag=false; h.style.transition='0.4s'; h.style.transform='translateX(0)'; } });
     </script>
 </body>
 </html>
