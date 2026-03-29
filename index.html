@@ -3,119 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>𝘍𝘈𝘕𝘡𝘡</title>
+    <title>𝘍𝘈𝘕𝘡𝘡 - SECURE v5.6</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: #050509; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
-            touch-action: manipulation;
-        }
-        .glass { 
-            background: rgba(255, 255, 255, 0.04); 
-            backdrop-filter: blur(20px); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-        }
-        
-        .scroll-container {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding-bottom: 40px;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .btn-premium {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .btn-premium:active { transform: scale(0.96); background: rgba(255, 255, 255, 0.1); }
-
-        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        #lock-screen {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: #050509;
-            z-index: 9999;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
-        }
-
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #050509; height: 100vh; display: flex; flex-direction: column; overflow: hidden; touch-action: none; }
+        .glass { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .scroll-container { flex-grow: 1; overflow-y: auto; padding-bottom: 100px; -webkit-overflow-scrolling: touch; }
         .scroll-container::-webkit-scrollbar { width: 0px; }
 
-        /* Z.AI CUSTOM: Floating Contact Buttons Styling */
-        .z-floating-contact {
-            position: fixed;
-            bottom: 25px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 1000;
+        /* --- VERIFIKASI GESER UI --- */
+        #verify-overlay {
+            position: fixed; inset: 0; background: #050509; z-index: 10000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px;
         }
-
-        .z-btn-contact {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            color: white;
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .slider-container {
+            width: 100%; max-width: 320px; height: 70px; background: rgba(255,255,255,0.03);
+            border-radius: 50px; position: relative; border: 1px solid rgba(255,255,255,0.08); overflow: hidden;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
         }
-
-        .z-btn-contact:active { transform: scale(0.9); }
-
-        .z-wa {
-            background-color: #25D366;
-            box-shadow: 0 0 20px rgba(37, 211, 102, 0.4);
+        .slider-text {
+            position: absolute; width: 100%; text-align: center; line-height: 70px;
+            font-size: 13px; font-weight: 800; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 2px;
+            user-select: none;
         }
+        #slider-handle {
+            width: 60px; height: 60px; background: #2563eb; border-radius: 50%;
+            position: absolute; top: 5px; left: 5px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; 
+            box-shadow: 0 0 25px rgba(37,99,235,0.6);
+            z-index: 2;
+            /* Z.AI Animasi Mental Balik */
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55), background 0.2s;
+        }
+        #slider-handle i { font-size: 24px; transition: 0.2s; }
         
-        .z-tg {
-            background-color: #0088cc;
-            box-shadow: 0 0 20px rgba(0, 136, 204, 0.4);
+        /* --- LOADING 20s UI --- */
+        #loading-screen {
+            display: none; position: fixed; inset: 0; background: #050509; z-index: 10001;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+        .progress-bar { width: 260px; height: 5px; background: rgba(255,255,255,0.08); border-radius: 10px; margin-top: 25px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+        .progress-fill { width: 0%; height: 100%; background: #00ff00; box-shadow: 0 0 20px #00ff00; transition: width 20s linear; }
+
+        /* --- FLOATING BUTTONS (BIGGER) --- */
+        .z-floating-contact { position: fixed; bottom: 30px; right: 25px; display: flex; flex-direction: column; gap: 18px; z-index: 999; }
+        .z-btn-contact { 
+            width: 65px; height: 65px; /* SCALED UP FROM 55px */
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            font-size: 30px; /* SCALED UP FROM 26px */
+            color: white; transition: 0.3s; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+        }
+        .z-btn-contact:active { transform: scale(0.9) translateY(2px); }
+        .z-wa { background: #25D366; box-shadow: 0 0 25px rgba(37,211,102,0.5); }
+        .z-tg { background: #0088cc; box-shadow: 0 0 25px rgba(0, 136, 204, 0.5); }
+
+        /* folder list animation */
+        .fade-in-up { animation: fadeInUp 0.4s ease-out forwards; opacity: 0; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body class="text-white p-6">
 
-    <div id="lock-screen">
-        <div class="text-[110px] mb-8 drop-shadow-[0_0_40px_rgba(239,68,68,0.4)]">🔒</div>
-        <h1 class="text-3xl font-black tracking-tighter uppercase italic">Server Update</h1>
-        <p class="text-slate-500 text-xs font-bold mt-4 tracking-[0.4em] uppercase">Maintenance Mode</p>
-        <div class="mt-12 w-16 h-1 bg-red-600 rounded-full animate-pulse"></div>
+    <div id="verify-overlay">
+        <div class="text-7xl mb-8 drop-shadow-[0_0_30px_rgba(37,99,235,0.3)]">🛡️</div>
+        <h2 class="text-2xl font-black italic uppercase tracking-tighter mb-12">Access Verification</h2>
+        <div class="slider-container">
+            <div class="slider-text">Geser Untuk Masuk</div>
+            <div id="slider-handle"><i class="fas fa-chevron-right text-white"></i></div>
+        </div>
     </div>
 
-    <div class="z-floating-contact">
-        <a href="https://t.me/fanzz_tz" target="_blank" class="z-btn-contact z-tg">
-            <i class="fab fa-telegram-plane"></i>
-        </a>
-        <a href="https://wa.me/6285808608116" target="_blank" class="z-btn-contact z-wa">
-            <i class="fab fa-whatsapp"></i>
-        </a>
+    <div id="loading-screen">
+        <div class="text-emerald-500 font-black text-sm tracking-[0.5em] uppercase mb-2 animate-pulse">Decrypting Server...</div>
+        <div id="timer-text" class="text-[11px] text-slate-500 font-bold mb-5">Security check in progress. Please wait 20s</div>
+        <div class="progress-bar"><div id="p-fill" class="progress-fill"></div></div>
     </div>
 
     <div class="flex justify-between items-center mb-10 shrink-0">
         <div class="flex items-center gap-4">
-            <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center font-black text-2xl shadow-2xl shadow-blue-900/40">M</div>
+            <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center font-black text-2xl shadow-xl shadow-blue-900/50">M</div>
             <div>
                 <h1 class="text-xl font-extrabold tracking-tighter uppercase italic leading-none">Mediafire</h1>
                 <span class="text-[9px] text-blue-400 font-bold tracking-[0.3em]">PREMIUM CLOUD Dvlo Fanzz</span>
@@ -129,65 +102,128 @@
     <div class="scroll-container">
         <p class="text-[10px] font-black text-sky-500 tracking-[0.4em] uppercase mb-6 ml-1">My Premium Dashboard</p>
         <div id="buttonList" class="space-y-4">
-            <div class="text-center py-20 opacity-20 text-[10px] font-bold tracking-widest uppercase animate-pulse">Menghubungkan ke Server...</div>
+            <div class="text-center py-20 opacity-20 text-[10px] font-bold tracking-widest uppercase animate-pulse">Memuat Data...</div>
         </div>
+    </div>
+
+    <div class="z-floating-contact">
+        <a href="https://t.me/GIGS_XYREN" target="_blank" class="z-btn-contact z-tg"><i class="fab fa-telegram-plane"></i></a>
+        <a href="https://wa.me/628xxxxxxxxxx" target="_blank" class="z-btn-contact z-wa"><i class="fab fa-whatsapp"></i></a>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+        // CONFIG (Lu pake yang punya lu sendiri)
         const firebaseConfig = {
             apiKey: "AIzaSyC_CzpM8loteQzOzfEWCz5cyhRhM1X8RTY",
-            authDomain: "control-admin-b96e2.firebaseapp.com",
             databaseURL: "https://control-admin-b96e2-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "control-admin-b96e2",
-            storageBucket: "control-admin-b96e2.firebasestorage.app",
-            messagingSenderId: "17029274720",
-            appId: "1:17029274720:web:b3f3ca1a74f3063d4af705"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const controlRef = ref(db, 'remote_control');
 
+        // --- LOGIKA SLIDER & ANIMASI ---
+        const handle = document.getElementById('slider-handle');
+        const overlay = document.getElementById('verify-overlay');
+        const loading = document.getElementById('loading-screen');
+        const fill = document.getElementById('p-fill');
+        const icon = handle.querySelector('i');
+        
+        let isDragging = false;
+        let startX = 0;
+        // Hitung batas geser maks dinamisi (container width - handle width - padding)
+        const maxSlide = 320 - 60 - 10; 
+
+        handle.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            startX = e.touches[0].clientX;
+            // Matikan transisi pas lagi ditarik jari biar responsif
+            handle.style.transition = 'none'; 
+            icon.style.transform = 'scale(1.2)';
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if(!isDragging) return;
+            let currentX = e.touches[0].clientX;
+            let moveX = currentX - startX;
+
+            // Batasi gerakan: nggak boleh minus, nggak boleh ngelebihi batas maks
+            if(moveX < 0) moveX = 0;
+            if(moveX > maxSlide) moveX = maxSlide;
+
+            handle.style.transform = `translateX(${moveX}px)`;
+
+            // Efek warna handle pas mendekati ujung
+            if(moveX > maxSlide * 0.8) {
+                handle.style.background = '#10b981'; // Ijo Emerald
+            } else {
+                handle.style.background = '#2563eb'; // Biru default
+            }
+
+            // Kalau sampe ujung, langsung eksekusi
+            if(moveX >= maxSlide) {
+                isDragging = false;
+                startLoading();
+            }
+        });
+
+        document.addEventListener('touchend', () => {
+            if(!isDragging) return;
+            isDragging = false;
+            
+            // AKTIFKAN ANIMASI MENTAL BALIK
+            handle.style.transition = 'transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55), background 0.2s';
+            handle.style.transform = 'translateX(0px)';
+            handle.style.background = '#2563eb';
+            icon.style.transform = 'scale(1)';
+        });
+
+        function startLoading() {
+            // Matikan scroll body pas loading
+            document.body.style.overflow = 'hidden'; 
+            overlay.style.display = 'none';
+            loading.style.display = 'flex';
+            
+            // Mulai animasi progress bar (linear 20s sesuai CSS)
+            setTimeout(() => { fill.style.width = '100%'; }, 100);
+            
+            // SELESAI LOADING SETELAH 20 DETIK
+            setTimeout(() => {
+                loading.style.display = 'none';
+                document.body.style.overflow = 'auto'; // Aktifkan scroll lagi
+            }, 20000); 
+        }
+
+        // --- FIREBASE SYNC (AUTO REFRESH REALTIME) ---
         onValue(controlRef, (snapshot) => {
             const data = snapshot.val();
             if (!data) return;
-
-            const lockScreen = document.getElementById('lock-screen');
-            if (data.serverStatus === false) {
-                lockScreen.style.display = 'flex';
-                return;
-            } else {
-                lockScreen.style.display = 'none';
-            }
-
             const listContainer = document.getElementById('buttonList');
-            listContainer.innerHTML = ""; 
-            let countVisible = 0;
+            listContainer.innerHTML = "";
+            let visibleCount = 0;
 
             for (let i = 1; i <= 10; i++) {
-                const btnData = data[`btn_${i}`];
-                if (btnData && !btnData.hidden && btnData.url && btnData.url.trim() !== "") {
-                    countVisible++;
-                    const displayName = btnData.name || `Folder Cloud ${i}`;
+                const btn = data[`btn_${i}`];
+                if (btn && !btn.hidden && btn.url) {
+                    visibleCount++;
                     listContainer.innerHTML += `
-                        <button onclick="window.location.href='${btnData.url}'" 
-                                class="glass btn-premium p-7 rounded-[2.8rem] flex items-center gap-6 w-full fade-in" 
-                                style="animation-delay: ${countVisible * 0.05}s">
+                        <div onclick="window.location.href='${btn.url}'" 
+                             class="glass p-7 rounded-[2.8rem] flex items-center gap-6 w-full mb-4 fade-in-up active:scale-95 transition-transform"
+                             style="animation-delay: ${visibleCount * 0.05}s">
                             <div class="text-5xl drop-shadow-md">📂</div>
-                            <div class="text-left">
-                                <h2 class="text-xl font-black mb-0.5 tracking-tight">${displayName}</h2>
+                            <div>
+                                <h2 class="text-xl font-black leading-tight">${btn.name || 'Folder '+i}</h2>
                                 <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Akses Download Cepat</p>
                             </div>
-                        </button>
-                    `;
+                        </div>`;
                 }
             }
-
-            if (countVisible === 0) {
-                listContainer.innerHTML = `<div class="text-center py-24 opacity-30"><p class="text-[10px] font-black uppercase tracking-[0.5em]">Tidak ada data</p></div>`;
+            if(visibleCount === 0) {
+                listContainer.innerHTML = `<div class="text-center py-20 opacity-30 text-[10px] font-bold tracking-widest uppercase">Tidak ada data server</div>`;
             }
         });
     </script>
